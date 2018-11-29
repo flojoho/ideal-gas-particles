@@ -1,0 +1,44 @@
+body{
+  margin: 0px;
+  padding: 0px;
+
+  font-family: Arial;
+  color: #111111;
+}
+
+.content{
+  margin: 0 auto;
+  padding: 0px;
+
+  width: 853px;
+
+  background-color: #cccccc;
+
+  overflow: hidden;
+}
+
+.left{
+  float: left;
+
+  width: 600px;
+  height: 100%;
+}
+
+.right{
+  float: left;
+  background-color: #eeeeee;
+
+  width: 253px;
+  height: 100%;
+}
+
+
+.settings {
+  height: 200px;
+
+  padding: 20px;
+}
+
+.graph {
+  height: 240px;
+}

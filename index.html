@@ -3,8 +3,31 @@
   <head>
     <title>ideal gas</title>
     <script src="script.js" defer></script>
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <canvas id="canvas" width="800" height="600">This application requires a browser that supports HTML5 and JavaScript.</canvas>
+    <div class="content">
+      <div class="left">
+        <canvas id="particleCanvas" width="600" height="480"></canvas>
+      </div>
+      <div class="right">
+        <div class="settings">
+          number of particles<br>
+          <input type="range" id="numberSlider" min="1" max="100">
+          <span id="number"></span><br>
+          <br>
+          average velocity<br>
+          <input type="range" id="energySlider" min="1" max="10">
+          <span id="energy"></span><br>
+          <br>
+          <br>
+          <br>
+          <a target="_blank" href="https://en.wikipedia.org/wiki/Rayleigh_distribution">Rayleigh distribution</a>:
+        </div>
+        <div class="graph">
+          <canvas id="graphCanvas" width="253" height="240"></canvas>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

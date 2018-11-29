@@ -1,100 +1,136 @@
-var canvas = document.getElementById('canvas');
-var c = canvas.getContext('2d');
+'use strict';
+
+const particleCanvas = document.getElementById('particleCanvas');
+const graphCanvas = document.getElementById('graphCanvas');
+
+const numberSlider = document.getElementById('numberSlider');
+const energySlider = document.getElementById('energySlider');
+
+const number = document.getElementById('number');
+const energy = document.getElementById('energy');
 
 
-var number = 500;
-var r = 5;
-var maxspeed = 5;
-var X = canvas.width;
-var Y = canvas.height;
+const ctx1 = particleCanvas.getContext('2d');
+const ctx2 = graphCanvas.getContext('2d');
+
+
+const fps = 30;
+
+const numberOfParticles = parseInt(numberSlider.value);
+let averageVelSetting = parseInt(energySlider.value);
+const radius = 10;
+
+let averageSpeed;
+let correctionFactor;
 
 
 
-function particle() {
-  this.x = Math.random()*X;
-  this.y = Math.random()*Y;
-  
-  this.vx = (Math.random()*2-1)*maxspeed;
-  this.vy = (Math.random()*2-1)*maxspeed;
+let summedVelocities = [];
+let sampleSize = 0;
+const resetStatistics = function(){
+  summedVelocities = summedVelocities.map(entry => 0);
+  sampleSize = 0;
 }
 
-particle.prototype.draw = function(){
-  //this.vy += 0.1;
+function Particle() {
+  this.x = Math.random() * particleCanvas.width;
+  this.y = Math.random() * particleCanvas.height;
   
+  this.vx = (Math.random() * 2 - 1) * averageVelSetting;
+  this.vy = (Math.random() * 2 - 1) * averageVelSetting;
+}
+
+Particle.prototype.draw = function(){
+  
+  //iterate
+  this.vx *= correctionFactor;
+  this.vy *= correctionFactor;
+
   this.x += this.vx;
   this.y += this.vy;
   
-  if(this.x > X && this.vx > 0) {
-    this.x -= 2 * (this.x - X);
+
+
+  //wall collision
+  if(this.x > particleCanvas.width - radius && this.vx > 0) {
+    this.x -= 2 * (this.x - (particleCanvas.width - radius));
     this.vx = -this.vx;
   }
   
-  if(this.x < 0 && this.vx < 0) {
-    this.x -= 2 * this.x;
+  if(this.x < radius && this.vx < 0) {
+    this.x -= 2 * (this.x - radius);
     this.vx = -this.vx;
   }
   
   
-  if(this.y > Y && this.vy > 0) {
-    this.y -= 2 * (this.y - Y);
+  if(this.y > particleCanvas.height - radius && this.vy > 0) {
+    this.y -= 2 * (this.y - (particleCanvas.height - radius));
     this.vy = -this.vy;
   }
   
-  if(this.y < 0 && this.vy < 0) {
-    this.y -= 2 * this.y;
+  if(this.y < radius && this.vy < 0) {
+    this.y -= 2 * (this.y - radius);
     this.vy = -this.vy;
   }
   
   
-  
-  
-  c.fillStyle = "#ffffff";
-  c.beginPath();
-  c.arc(this.x, this.y, r, 0, 2*Math.PI);
-  c.fill();
-  
-  
+  //draw particle
+  ctx1.fillStyle = "#ffffff";
+  ctx1.beginPath();
+  ctx1.arc(this.x, this.y, radius, 0, 2 * Math.PI);
+  ctx1.fill();
 }
 
 
-var stat = new Array();
 
 
-var particles = new Array();
-for(var i=0; i<number; i++){
-  particles[i] = new particle();
+number.innerText = numberSlider.value;
+energy.innerText = energySlider.value;
+
+
+const particles = [];
+for(let i = 0; i < numberOfParticles; i++){
+  particles.push(new Particle());
 }
+
+
+
 
 setInterval(function(){
-  c.fillStyle = "#000000";
-  c.fillRect(0, 0, canvas.width, canvas.height);
   
-  for(var i=0; i<number; i++){
-    particles[i].draw();
+  //clear canvas
+  ctx1.fillStyle = "#111111";
+  ctx1.fillRect(0, 0, particleCanvas.width, particleCanvas.height);
+  
+
+  averageSpeed = particles.reduce((acc, cur) => acc + Math.sqrt(cur.vx**2 + cur.vy**2), 0) / particles.length;
+  correctionFactor = averageVelSetting / averageSpeed;
+
+  for(const particle of particles){
+    particle.draw();
   }
   
   
-  for(var i=0; i<number; i++){
-    for(var j=i+1; j<number; j++){
-      if(Math.abs(particles[i].x-particles[j].x)<2*r && Math.abs(particles[i].y-particles[j].y)<2*r){
-        var squared = Math.pow(particles[i].x-particles[j].x, 2) + Math.pow(particles[i].y-particles[j].y, 2);
-        if(squared < 4*r*r){
-          /*c.fillStyle = "#ff0000";
-          c.fillRect(particles[i].x, particles[i].y, 10, 10);
-          c.fillRect(particles[j].x, particles[j].y, 10, 10);*/
+  for(let i = 0; i < particles.length; i++){
+    for(let j = i + 1; j < particles.length; j++){
+
+      //collision between particles
+      if(Math.abs(particles[i].x - particles[j].x) < 2 * radius && Math.abs(particles[i].y - particles[j].y) < 2 * radius){
+        const squared = (particles[i].x - particles[j].x) ** 2
+                      + (particles[i].y - particles[j].y) ** 2;
+
+        if(squared < 4 * radius ** 2){
+          const dvx = particles[i].vx - particles[j].vx;
+          const dvy = particles[i].vy - particles[j].vy;
           
+          const dx = particles[j].x - particles[i].x;
+          const dy = particles[j].y - particles[i].y;
           
-          dvx = particles[i].vx - particles[j].vx;
-          dvy = particles[i].vy - particles[j].vy;
+          //squared = dx**2 + dy**2; //variablenname already taken!
+          const scalar = dvx*dx + dvy*dy;
           
-          dx = particles[j].x-particles[i].x;
-          dy = particles[j].y-particles[i].y;
-          
-          squared = dx*dx + dy*dy; //variablenname schon besetzt!
-          scalar = dvx*dx + dvy*dy;
-          
-          dvx2 = dx*scalar/squared;
-          dvy2 = dy*scalar/squared;
+          const dvx2 = dx*scalar/squared;
+          const dvy2 = dy*scalar/squared;
           
           
           particles[i].vx -= dvx2;
@@ -105,8 +141,8 @@ setInterval(function(){
           
           
           
-          //provisorisch!!!
-          var versatz = (r/Math.sqrt(squared) - 1/2);
+          //avoid particles 'sticking to each other'
+          const versatz = (radius / Math.sqrt(squared) - 1/2);
           
           particles[i].x -= dx*versatz;
           particles[i].y -= dy*versatz;
@@ -119,45 +155,93 @@ setInterval(function(){
   }
   
   
+
+
+
+
+
+
   
-  //histogramm
-  width = 600;
-  height = 10; //höhenfaktor
-  vmax = 10;
-  n=50;
+  //histogram
+  const width = 200; //actually 213
+  const heightFactor = 10; //höhenfaktor
+  const vmax = 10;
+  const n = 20;
   
-  var vel = new Array();
+  const vel = [];
   
-  for(var i=0; i<n; i++) vel[i]=0;
+  //clear canvas
+  ctx2.fillStyle = '#eeeeee';
+  ctx2.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
   
-  for(var i=0; i<number; i++){
-    v = Math.sqrt(Math.pow(particles[i].vx, 2) + Math.pow(particles[i].vy, 2));
-    range = Math.floor(v*n/vmax);
+
+  for(let i = 0; i < n; i++){
+    vel[i] = 0;
+  }
+  
+  for(let i = 0; i < particles.length; i++){
+    const v = Math.sqrt(particles[i].vx ** 2 + particles[i].vy ** 2);
+    const range = Math.floor(v * n / vmax);
     vel[range] += 1;
   }
   
-  for(var i=0; i<n; i++) {
-    c.fillStyle = "rgba(255, 0, 0, 0.5)";
-    c.fillRect(100 + i*width/n, Y-100-vel[i]*height, width/n, vel[i]*height);
+  for(let i = 0; i < n; i++) {
+    ctx2.fillStyle = "rgba(255, 0, 0, 0.5)";
+    ctx2.fillRect(20 + i * width / n, graphCanvas.height - 20 - vel[i] * heightFactor, width / n, vel[i] * heightFactor);
   }
   
   
   
   
-  //kurve
-  if(stat[0] == undefined){
-    for(var i=0; i<n; i++) stat[i]=0;
-    sample = 0;
+  //draw curve
+  if(summedVelocities.length === 0){
+    for(let i = 0; i < n; i++){
+      summedVelocities[i] = 0;
+    }
   }
   
-  for(var i=0; i<n; i++) stat[i]+=vel[i];
-  sample += 1;
+  for(let i = 0; i < n; i++){
+    summedVelocities[i] += vel[i];
+  }
+  sampleSize += 1;
+
+  ctx2.strokeStyle = "#ff0000";
+  ctx2.lineWidth = 3;
+  ctx2.beginPath();
+  ctx2.moveTo(20, graphCanvas.height - 20 - summedVelocities[0] / sampleSize * heightFactor);
+  for(let i = 0; i < n; i++) {
+    ctx2.lineTo(20 + i * width / n, graphCanvas.height - 20 - summedVelocities[i] / sampleSize * heightFactor);
+  }
+  ctx2.stroke();
   
-  c.strokeStyle = "#ff0000";
-  c.lineWidth = 3;
-  c.moveTo(100, Y-100-stat[0]/sample*height);
-  for(var i=0; i<n; i++) c.lineTo(100 + i*width/n, Y-100-stat[i]/sample*height);
-  c.stroke();
   
-  
-}, 1);
+}, 1000/fps);
+
+
+
+
+numberSlider.addEventListener('input', () => {
+  const newNumber = parseInt(numberSlider.value);
+
+  //add/remove extra particles
+  while(particles.length > newNumber){
+    particles.pop();
+  }
+
+  while(particles.length < newNumber){
+    particles.push(new Particle());
+  }
+
+  number.innerText = newNumber;
+
+
+  resetStatistics();
+});
+
+energySlider.addEventListener('input', () => {
+  averageVelSetting = parseInt(energySlider.value);
+
+  energy.innerText = averageVelSetting;
+
+  resetStatistics();
+});
