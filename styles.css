@@ -6,13 +6,15 @@ body{
   color: #111111;
 }
 
+canvas {
+  display: block;
+}
+
 .content{
   margin: 0 auto;
   padding: 0px;
 
   width: 853px;
-
-  background-color: #cccccc;
 
   overflow: hidden;
 }
