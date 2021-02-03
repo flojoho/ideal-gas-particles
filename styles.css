@@ -1,46 +1,51 @@
-body{
+body {
   margin: 0px;
   padding: 0px;
-
   font-family: Arial;
   color: #111111;
+  display: flex;
+  justify-content: center;
 }
 
 canvas {
   display: block;
 }
 
-.content{
-  margin: 0 auto;
-  padding: 0px;
-
-  width: 853px;
-
-  overflow: hidden;
+a {
+  color: #FF0000;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
 
-.left{
-  float: left;
-
-  width: 600px;
-  height: 100%;
-}
-
-.right{
-  float: left;
-  background-color: #eeeeee;
-
-  width: 253px;
-  height: 100%;
-}
-
-
-.settings {
-  height: 200px;
-
+aside {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.graph {
-  height: 240px;
+
+#histogram {
+  background-color: white;
+  margin-top: 10px;
+}
+
+
+.content{
+  display: flex;
+  background-color: #EEEEEE;
+}
+
+.slider {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+.slider label {
+  margin-bottom: 5px;
+}
+.slider span {
+  margin-left: 10px;
 }

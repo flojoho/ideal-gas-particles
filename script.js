@@ -1,7 +1,7 @@
 'use strict';
 
 const particleCanvas = document.getElementById('particleCanvas');
-const graphCanvas = document.getElementById('graphCanvas');
+const histogram = document.getElementById('histogram');
 
 const numberSlider = document.getElementById('numberSlider');
 const energySlider = document.getElementById('energySlider');
@@ -11,7 +11,7 @@ const energy = document.getElementById('energy');
 
 
 const ctx1 = particleCanvas.getContext('2d');
-const ctx2 = graphCanvas.getContext('2d');
+const ctx2 = histogram.getContext('2d');
 
 
 const fps = 30;
@@ -172,7 +172,7 @@ setInterval(function(){
   
   //clear canvas
   ctx2.fillStyle = '#eeeeee';
-  ctx2.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+  ctx2.clearRect(0, 0, histogram.width, histogram.height);
   
 
   for(let i = 0; i < n; i++){
@@ -187,7 +187,7 @@ setInterval(function(){
   
   for(let i = 0; i < n; i++) {
     ctx2.fillStyle = "rgba(255, 0, 0, 0.5)";
-    ctx2.fillRect(20 + i * width / n, graphCanvas.height - 20 - vel[i] * heightFactor, width / n, vel[i] * heightFactor);
+    ctx2.fillRect(20 + i * width / n, histogram.height - 20 - vel[i] * heightFactor, width / n, vel[i] * heightFactor);
   }
   
   
@@ -208,9 +208,9 @@ setInterval(function(){
   ctx2.strokeStyle = "#ff0000";
   ctx2.lineWidth = 3;
   ctx2.beginPath();
-  ctx2.moveTo(20, graphCanvas.height - 20 - summedVelocities[0] / sampleSize * heightFactor);
+  ctx2.moveTo(20, histogram.height - 20 - summedVelocities[0] / sampleSize * heightFactor);
   for(let i = 0; i < n; i++) {
-    ctx2.lineTo(20 + i * width / n, graphCanvas.height - 20 - summedVelocities[i] / sampleSize * heightFactor);
+    ctx2.lineTo(20 + i * width / n, histogram.height - 20 - summedVelocities[i] / sampleSize * heightFactor);
   }
   ctx2.stroke();
   
