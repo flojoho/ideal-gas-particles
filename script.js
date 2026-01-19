@@ -99,7 +99,7 @@ for(let i = 0; i < numberOfParticles; i++){
 setInterval(function(){
   
   //clear canvas
-  ctx1.fillStyle = "#111111";
+  ctx1.fillStyle = 'black';
   ctx1.fillRect(0, 0, particleCanvas.width, particleCanvas.height);
   
 

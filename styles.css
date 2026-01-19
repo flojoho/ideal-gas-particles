@@ -1,14 +1,58 @@
+:root {
+  --white: #FFFFFF;
+  --light-gray: #DDDDDD;
+  --gray: hsl(0, 0%, 50%);
+  --dark-gray: hsl(0, 0%, 18%);
+  --black: hsl(0, 0%, 10%);
+  font-size: 1.1rem;
+}
+
 body {
   margin: 0px;
   padding: 0px;
-  font-family: Arial;
-  color: #111111;
+  font-family: monospace;
+  color: var(--white);
   display: flex;
   justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--black);
 }
+
+
+.content{
+  display: flex;
+  background-color: var(--dark-gray);
+  border-radius: 0.3rem;
+}
+
 
 canvas {
   display: block;
+}
+#particleCanvas {
+  border-top-left-radius: 0.3rem;
+  border-bottom-left-radius: 0.3rem;
+}
+
+
+aside {
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.slider {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.6rem;
+}
+.slider label {
+  margin-bottom: 0.6rem;
+}
+.slider span {
+  margin-left: 0.2rem;
 }
 
 a {
@@ -19,33 +63,7 @@ a:hover {
   text-decoration: underline;
 }
 
-aside {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-
 #histogram {
-  background-color: white;
-  margin-top: 10px;
-}
-
-
-.content{
-  display: flex;
-  background-color: #EEEEEE;
-}
-
-.slider {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-}
-.slider label {
-  margin-bottom: 5px;
-}
-.slider span {
-  margin-left: 10px;
+  background-color: var(--black);
+  margin-top: 0.6rem;
 }
